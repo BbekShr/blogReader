@@ -23,15 +23,75 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             (data, response, error) in
             
             if error != nil {
+                
                 print(error)
+                
             } else {
                 if let urlContent = data {
                     
                     do {
                         let jsonResult = try JSONSerialization.jsonObject(with: urlContent, options: JSONSerialization.ReadingOptions.mutableContainers)
+                        //print(jsonResult)
                         
                         
-                    } catch{
+                        if let items = (jsonResult as AnyObject)["items"]! as? NSArray
+                        {
+                            let context = self.fetchedResultsController.managedObjectContext
+                            let request = NSFetchRequest<Event>(entityName: "Event")
+
+                            do{
+                                
+                                let results = try context.fetch(request)
+                                if results.count > 0 {
+                                    for result in results {
+                                        context.delete(result)
+                                        
+                                        do {
+                                            try context.save()
+                                        } catch {
+                                            print("Specific deletion failed")
+                                        }
+                                    }
+                                }
+                                
+                            } catch {
+                                print("delete failed")
+                                
+                            }
+                            
+                            for item in items as [AnyObject] {
+                            print(item["title"])
+                            print(item["content"])
+                                
+                                let newEvent = Event(context: context)
+                                
+                                // If appropriate, configure the new managed object.
+                                newEvent.timestamp = Date()
+                                
+                                newEvent.setValue(item["title"] as! String, forKey: "title")
+                                newEvent.setValue(item["content"] as! String, forKey: "content")
+                                
+                                // Save the context.
+                                
+                                do {
+                                    try context.save()
+                                } catch {
+            
+                                    let nserror = error as NSError
+                                    fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+                                }
+                                
+                                
+                            }
+                            
+                            DispatchQueue.main.async(execute: {
+                                self.tableView.reloadData()
+                            })
+                        }
+                        
+                      //  print(jsonResult["items"])
+                    } catch
+                    {
                         
                     }
                     
@@ -122,7 +182,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 //    }
 
     func configureCell(_ cell: UITableViewCell, withEvent event: Event) {
-        cell.textLabel!.text = event.timestamp!.description
+        cell.textLabel!.text = event.value(forKey: "title") as? String
     }
 
     // MARK: - Fetched results controller
