@@ -20,8 +20,6 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         
         let url = URL(string: "https://www.googleapis.com/blogger/v3/blogs/10861780/posts?key=AIzaSyCzKEctJrQ-HFHTTTmURy5EgcDNnQsDJk0")
         
-        
-        
         let task = URLSession.shared.dataTask(with: url!) {
             (data, response, error) in
             
@@ -95,28 +93,6 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         }
         task.resume()
 
-    }
-
-//    override func viewWillAppear(_ animated: Bool) {
-//        clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
-//        super.viewWillAppear(animated)
-//    }
-
-    @objc
-    func insertNewObject(_ sender: Any) {
-        let context = self.fetchedResultsController.managedObjectContext
-        let newEvent = Event(context: context)
-             
-        // If appropriate, configure the new managed object.
-        newEvent.timestamp = Date()
-
-        // Save the context.
-        do {
-            try context.save()
-        } catch {
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
     }
 
     // MARK: - Segues
@@ -230,15 +206,6 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         tableView.endUpdates()
     }
-
-    /*
-     // Implementing the above methods to update the table view in response to individual changes may have performance implications if a large number of changes are made simultaneously. If this proves to be an issue, you can instead just implement controllerDidChangeContent: which notifies the delegate that all section and object changes have been processed.
-     
-     func controllerDidChangeContent(controller: NSFetchedResultsController) {
-         // In the simplest, most efficient, case, reload the table view.
-         tableView.reloadData()
-     }
-     */
 
 }
 
